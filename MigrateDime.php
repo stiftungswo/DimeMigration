@@ -50,7 +50,7 @@ foreach ($oldEmployees as $oldEmployee) {
 
         // TODO Dynamically generate a fine password and save it to a file on the disk
         $newEmployeeId = Capsule::connection('newDime')->table('employees')->insertGetId([
-            'archived' => $oldEmployee->enabled == 1,
+            'archived' => $oldEmployee->enabled != 1,
             'can_login' => $oldEmployee->enabled == 1,
             'created_at' => $oldEmployee->created_at,
             'email' => $oldEmployee->email,
@@ -164,5 +164,100 @@ foreach ($oldServices as $oldService) {
             'updated_at' => $rateOfService->updated_at,
             'value' => HelperMethods::examineMoneyValue($rateOfService->rate_value)
         ]);
+    }
+}
+
+HelperMethods::printWithNewLine("\nMigrating customers ...");
+$oldCustomers = Capsule::connection('oldDime')->table('customers')->get();
+foreach ($oldCustomers as $oldCustomer) {
+    // if the existing customer has the company field out, check if we have this company already
+    // if not, create it, otherweise use the existing one
+    if (!empty($oldCustomer->company)) {
+        $potentialAlreadyMigratedCompany = Capsule::connection('newDime')->table('customers')->where([
+            ['name', '=', $oldCustomer->company]
+        ])->first();
+
+        if (is_null($potentialAlreadyMigratedCompany)) {
+            HelperMethods::printWithNewLine("Creating a new company " . $oldCustomer->company);
+            $newCompanyId = Capsule::connection('newDime')->table('customers')->insertGetId([
+                'name' => $oldCustomer->company,
+                'hidden' => $oldCustomer->system_customer != 1,
+                'type' => 'company',
+                'rate_group_id' => $reverseRateGroups[$oldCustomer->rate_group_id]
+                ]);
+        } else {
+            $newCompanyId = $potentialAlreadyMigratedCompany->id;
+        }
+    }
+
+    // create new person
+    $partForName = explode(' ', !empty($oldCustomer->full_name) ?: $oldCustomer->name);
+    $lastName = array_pop($partForName);
+    $firstName = array(implode(' ', $partForName), $lastName)[0];
+
+    HelperMethods::printWithNewLine("Creating a new person " . $firstName . ' ' . $lastName);
+    $newPersonId = Capsule::connection('newDime')->table('customers')->insertGetId([
+        'company_id' => $oldCustomer->company ? $newCompanyId : null,
+        'comment' => $oldCustomer->comment,
+        'created_at' => $oldCustomer->created_at,
+        'created_by' => $reverseEmployees[$oldCustomer->user_id],
+        'department' => $oldCustomer->department,
+        'email' => $oldCustomer->email,
+        'hidden' => $oldCustomer->system_customer != 1,
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+        'rate_group_id' => $oldCustomer->rate_group_id,
+        'type' => 'person',
+        'salutation' => $oldCustomer->salutation,
+        'updated_at' => $oldCustomer->updated_at
+    ]);
+
+    // create new phone if set on old customer
+    if (!empty($oldCustomer->phone)) {
+        HelperMethods::printWithNewLine("Creating new phone for " . $firstName . ' ' . $lastName);
+        Capsule::connection('newDime')->table('phones')->insert([
+            'category' => $oldCustomer->company ? 2 : 3,
+            'customer_id' => $newPersonId,
+            'number' => $oldCustomer->phone,
+        ]);
+    }
+
+    // create new mobile number if set on old customer
+    if (!empty($oldCustomer->mobilephone)) {
+        HelperMethods::printWithNewLine("Creating new mobile phone for " . $firstName . ' ' . $lastName);
+        Capsule::connection('newDime')->table('phones')->insert([
+            'category' => 4,
+            'customer_id' => $newPersonId,
+            'number' => $oldCustomer->mobilephone,
+        ]);
+    }
+
+    $addressOfOldCustomer = $ratesOfService = Capsule::connection('oldDime')->table('address')
+        ->where('id', '=', $oldCustomer->address_id)->first();
+
+    if (!is_null($addressOfOldCustomer)) {
+        if (!empty($addressOfOldCustomer->street) && !empty($addressOfOldCustomer->plz) && !empty($addressOfOldCustomer->city)) {
+            HelperMethods::printWithNewLine("Creating new address for " . $firstName . ' ' . $lastName);
+            Capsule::connection('newDime')->table('addresses')->updateOrInsert([
+                'city' => $addressOfOldCustomer->city,
+                'country' => $addressOfOldCustomer->country,
+                'customer_id' => $oldCustomer->company ? $newCompanyId : $newPersonId,
+                'postcode' => $addressOfOldCustomer->plz,
+                'street' => $addressOfOldCustomer->street,
+                'supplement' => $addressOfOldCustomer->supplement,
+            ], [
+                'created_at' => $oldCustomer->created_at,
+                'created_by' => $reverseEmployees[$oldCustomer->user_id],
+                'city' => $addressOfOldCustomer->city,
+                'country' => $addressOfOldCustomer->country,
+                'customer_id' => $oldCustomer->company ? $newCompanyId : $newPersonId,
+                'postcode' => $addressOfOldCustomer->plz,
+                'street' => $addressOfOldCustomer->street,
+                'supplement' => $addressOfOldCustomer->supplement,
+                'updated_at' => $oldCustomer->updated_at
+            ]);
+        } else {
+            HelperMethods::printWithNewLine("Missing Street, PLZ or city for new address for " . $firstName . ' ' . $lastName);
+        }
     }
 }
