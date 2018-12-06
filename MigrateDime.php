@@ -7,6 +7,7 @@ $customerMigrator = new \EntityMigrator\CustomerMigrator();
 $employeeMigrator = new \EntityMigrator\EmployeeWithWorkPeriodMigrator();
 $holidayMigrator = new \EntityMigrator\HolidayMigrator();
 $offerMigrator = new \EntityMigrator\OfferMigrator();
+$projectMigrator = new \EntityMigrator\ProjectMigrator();
 $projectCategoryMigrator = new \EntityMigrator\ProjectCategoryMigrator();
 $rateGroupMigrator = new \EntityMigrator\RateGroupMigrator();
 $serviceMigrator = new \EntityMigrator\ServiceWithRatesMigrator();
@@ -31,7 +32,10 @@ $reverseServices = $serviceMigrator->doMigration($reverseEmployees, $reverseRate
 $reverseCustomers = $customerMigrator->doMigration($reverseEmployees, $reverseRateGroups);
 
 // migrate offers including their positions and their discounts
-$offerMigrator->doMigration($reverseCustomers, $reverseEmployees, $reverseRateGroups, $reverseServices);
+$reverseOffers = $offerMigrator->doMigration($reverseCustomers, $reverseEmployees, $reverseRateGroups, $reverseServices);
 
 // migrate project categories
 $reverseProjectCategories = $projectCategoryMigrator->doMigration();
+
+// migrate projects
+$projectMigrator->doMigration($reverseCustomers, $reverseEmployees, $reverseOffers, $reverseProjectCategories, $reverseRateGroups, $reverseServices);

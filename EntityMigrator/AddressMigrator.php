@@ -9,7 +9,7 @@ class AddressMigrator extends BaseMigrator
     public function doMigration(\stdClass $oldAddress, $newCustomerId)
     {
         if (!empty($oldAddress->street) && !empty($oldAddress->plz) && !empty($oldAddress->city)) {
-            HelperMethods::printWithNewLine("Creating new address for new customer " . $newCustomerId);
+            HelperMethods::printWithNewLine("Creating or updating new address for new customer " . $newCustomerId);
             $this->capsule->connection('newDime')->table('addresses')->updateOrInsert([
                 'city' => $oldAddress->city,
                 'country' => $oldAddress->country,
@@ -29,7 +29,7 @@ class AddressMigrator extends BaseMigrator
             HelperMethods::printWithNewLine("Missing Street, PLZ or city for address " . $oldAddress->id);
         }
 
-        return $newAddressOfOffer = $this->capsule->connection('newDime')->table('addresses')->where([
+        return $this->capsule->connection('newDime')->table('addresses')->where([
             'city' => $oldAddress->city,
             'country' => $oldAddress->country,
             'customer_id' => $newCustomerId,
