@@ -50,6 +50,7 @@ class ProjectMigrator extends BaseMigrator
                 'customer_id' => $reverseCustomers[$oldProject->customer_id]['person'],
                 'deadline' => $oldProject->deadline,
                 'description' => $oldProject->description,
+                'id' => $oldProject->id,
                 'fixed_price' => HelperMethods::examineMoneyValue($oldProject->fixed_price),
                 'name' => $oldProject->name,
                 'offer_id' => is_null($eventualOffer) ? null : $reverseOffers[$eventualOffer->id],

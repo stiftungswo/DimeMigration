@@ -25,6 +25,7 @@ class OfferMigrator extends BaseMigrator
                 'created_by' => is_null($oldOffer->user_id) ? null : $reverseEmployees[$oldOffer->user_id],
                 'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'],
                 'description' => $oldOffer->description,
+                'id' => $oldOffer->id,
                 'fixed_price' => HelperMethods::examineMoneyValue($oldOffer->fixed_price),
                 'name' => $oldOffer->name,
                 'rate_group_id' => $reverseRateGroups[$oldOffer->rate_group_id],
