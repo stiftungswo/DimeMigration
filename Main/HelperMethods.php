@@ -1,5 +1,7 @@
 <?php
 
+namespace Main;
+
 class HelperMethods
 {
     public static function examineMoneyValue($value)
