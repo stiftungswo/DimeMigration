@@ -11,7 +11,6 @@ class OfferMigrator extends BaseMigrator
         $oldOffers = $this->capsule->connection('oldDime')->table('offers')->get();
         $addressMigrator = new AddressMigrator();
         $rateUnitMigrator = new RateUnitMigrator();
-        $reverseOffers = [];
 
         foreach ($oldOffers as $oldOffer) {
             HelperMethods::printWithNewLine("\nMigrating offer " . $oldOffer->id);
@@ -26,15 +25,13 @@ class OfferMigrator extends BaseMigrator
                 'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'],
                 'description' => $oldOffer->description,
                 'id' => $oldOffer->id,
-                'fixed_price' => HelperMethods::examineMoneyValue($oldOffer->fixed_price),
+                'fixed_price' => HelperMethods::examineMoneyValue($oldOffer->fixed_price, true),
                 'name' => $oldOffer->name,
                 'rate_group_id' => $reverseRateGroups[$oldOffer->rate_group_id],
                 'short_description' => $oldOffer->short_description,
                 'status' => $oldOffer->status_id,
                 'updated_at' => $oldOffer->updated_at
             ]);
-
-            $reverseOffers[$oldOffer->id] = $newOfferId;
 
             $oldPositionsOfOffer = $this->capsule->connection('oldDime')->table('offer_positions')->where('offer_id', '=', $oldOffer->id)->get();
             HelperMethods::printWithNewLine("Migrating positions for " . $oldOffer->id);
@@ -65,7 +62,5 @@ class OfferMigrator extends BaseMigrator
                 ]);
             }
         }
-
-        return $reverseOffers;
     }
 }

@@ -6,10 +6,9 @@ use Main\HelperMethods;
 
 class ProjectMigrator extends BaseMigrator
 {
-    public function doMigration(array $reverseCustomers, array $reverseEmployees, array $reverseOffers, array $reverseProjectCategories, array $reverseRateGroups, array $reverseServices)
+    public function doMigration(array $reverseCustomers, array $reverseEmployees, array $reverseProjectCategories, array $reverseRateGroups, array $reverseServices)
     {
         $addressMigrator = new AddressMigrator();
-        $rateUnitMigrator = new RateUnitMigrator();
 
         $oldProjects = $this->capsule->connection('oldDime')->table('projects')->get();
 
@@ -39,7 +38,7 @@ class ProjectMigrator extends BaseMigrator
                 $newAddress = $addressMigrator->doMigration($oldAddress, empty($reverseCustomers[$oldProject->customer_id]['company']) ? $reverseCustomers[$oldProject->customer_id]['person'] : $reverseCustomers[$oldProject->customer_id]['company']);
             }
 
-            $newProjectId = $this->capsule->connection('newDime')->table('projects')->insertGetId([
+            $this->capsule->connection('newDime')->table('projects')->insert([
                 'accountant_id' => $oldProject->accountant_id ? $reverseEmployees[$oldProject->accountant_id] : $oldProject->accountant_id,
                 'address_id' => is_null($newAddress) ? null : $newAddress->id,
                 'archived' => $oldProject->archived == 1,
@@ -51,34 +50,13 @@ class ProjectMigrator extends BaseMigrator
                 'deadline' => $oldProject->deadline,
                 'description' => $oldProject->description,
                 'id' => $oldProject->id,
-                'fixed_price' => HelperMethods::examineMoneyValue($oldProject->fixed_price),
+                'fixed_price' => HelperMethods::examineMoneyValue($oldProject->fixed_price, true),
                 'name' => $oldProject->name,
-                'offer_id' => is_null($eventualOffer) ? null : $reverseOffers[$eventualOffer->id],
+                'offer_id' => $eventualOffer ? $eventualOffer->id : null,
                 'rate_group_id' => $reverseRateGroups[$oldProject->rate_group_id],
                 'updated_at' => $oldProject->updated_at,
                 'vacation_project' => $oldProject->name == 'SWO: Ferien'
             ]);
-
-            // migrate its positions
-            $oldPositionsOfProject = $this->capsule->connection('oldDime')->table('activities')->where([
-                'project_id' => $oldProject->id
-            ])->get();
-
-            HelperMethods::printWithNewLine("\nMigrating positions for project " . $oldProject->id);
-            foreach ($oldPositionsOfProject as $oldProjectPosition) {
-                $this->capsule->connection('newDime')->table('project_positions')->insert([
-                    'created_at' => $oldProjectPosition->created_at,
-                    // 'created_by' => $oldProjectPosition->user_id ? $reverseEmployees[$oldProjectPosition->user_id] : null,
-                    'deleted_at' => $oldProjectPosition->deleted_at,
-                    'description' => $oldProjectPosition->description,
-                    'price_per_rate' => HelperMethods::examineMoneyValue($oldProjectPosition->rate_value),
-                    'project_id' => $newProjectId,
-                    'rate_unit_id' => $rateUnitMigrator->doMigration($oldProjectPosition->rateUnitType_id, $oldProjectPosition->rate_unit),
-                    'service_id' => $reverseServices[$oldProjectPosition->service_id],
-                    'updated_at' => $oldProjectPosition->updated_at,
-                    'vat' => $oldProjectPosition->vat ?: 0
-                ]);
-            }
         }
     }
 }

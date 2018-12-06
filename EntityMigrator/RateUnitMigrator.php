@@ -35,6 +35,7 @@ class RateUnitMigrator extends BaseMigrator
                 'created_at' => new DateTime(),
                 'effort_unit' => $effort_unit,
                 'factor' => $oldRateUnit->factor == 1 ? 1 : $oldRateUnit->factor / 60,
+                'is_time' => $oldRateUnit->factor != 1,
                 'name' => $billing_unit,
                 'updated_at' => new DateTime(),
             ]);

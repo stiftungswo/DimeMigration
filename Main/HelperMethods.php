@@ -4,7 +4,7 @@ namespace Main;
 
 class HelperMethods
 {
-    public static function examineMoneyValue($value)
+    public static function examineMoneyValue($value, $allowNull = false)
     {
         $cleanValue = $value;
 
@@ -16,7 +16,13 @@ class HelperMethods
             $cleanValue = floatval($cleanValue) * 100;
         }
 
-        return intval($cleanValue);
+        $cleanValue = intval($cleanValue);
+
+        if ($cleanValue === 0) {
+            return $allowNull ? null : 0;
+        } else {
+            return $cleanValue;
+        }
     }
 
     public static function printWithNewLine($message)
