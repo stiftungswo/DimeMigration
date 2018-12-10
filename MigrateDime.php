@@ -3,9 +3,11 @@
 require __DIR__ . '/vendor/autoload.php';
 
 // Initialize all those different migrators
+$costgroupMigrator = new \EntityMigrator\CostgroupMigrator();
 $customerMigrator = new \EntityMigrator\CustomerMigrator();
 $employeeMigrator = new \EntityMigrator\EmployeeWithWorkPeriodMigrator();
 $holidayMigrator = new \EntityMigrator\HolidayMigrator();
+$invoiceMigrator = new \EntityMigrator\InvoiceMigrator();
 $offerMigrator = new \EntityMigrator\OfferMigrator();
 $projectMigrator = new \EntityMigrator\ProjectMigrator();
 $projectCategoryMigrator = new \EntityMigrator\ProjectCategoryMigrator();
@@ -46,4 +48,10 @@ $projectMigrator->doMigration($reverseCustomers, $reverseEmployees, $reverseProj
 $projectCommentMigrator->doMigration($reverseEmployees);
 
 // migrate project positions with efforts
-$projectPositionWithEffortMigrate->doMigrate($reverseEmployees, $reverseServices);
+$reverseProjectPositions = $projectPositionWithEffortMigrate->doMigrate($reverseEmployees, $reverseServices);
+
+// migrate costgroups
+$reverseCostgroups = $costgroupMigrator->doMigrate();
+
+// migrates invoices
+$invoiceMigrator->doMigration($reverseCostgroups, $reverseCustomers, $reverseEmployees, $reverseProjectPositions);

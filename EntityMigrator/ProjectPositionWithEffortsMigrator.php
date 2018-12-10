@@ -12,6 +12,7 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
         // those get exposed during the migration of the project positions
         HelperMethods::printWithNewLine("\nMigrating project positions");
         $rateUnitMigrator = new RateUnitMigrator();
+        $reverseProjectPosition = [];
         $oldProjectPositions = $this->capsule->connection('oldDime')->table('activities')->get();
 
         foreach ($oldProjectPositions as $oldProjectPosition) {
@@ -32,12 +33,16 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
                 'vat' => $oldProjectPosition->vat ?: 0
             ]);
 
+            $reverseProjectPosition[$oldProjectPosition->id] = $newProjectPositionId;
+
             // now we can migrate the associated effort
             // if the factor of the new rate unit is not 1, we need to divide the value of the effort with 60
             // thats the same things that's happening with the old rate units
             HelperMethods::printWithNewLine("Migrating project efforts for position " . $oldProjectPosition->id);
             $oldTimeslicesOfPosition = $this->capsule->connection('oldDime')->table('timeslices')->where(
-                'activity_id', '=', $oldProjectPosition->id
+                'activity_id',
+                '=',
+                $oldProjectPosition->id
             )->get();
 
             foreach ($oldTimeslicesOfPosition as $oldTimeslice) {
@@ -53,5 +58,7 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
                 ]);
             }
         }
+
+        return $reverseProjectPosition;
     }
 }
