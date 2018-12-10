@@ -90,7 +90,7 @@ class InvoiceMigrator extends BaseMigrator
                     'name' => $oldInvoiceDiscount->name,
                     'percentage' => $oldInvoiceDiscount->percentage == 1,
                     'updated_at' => $oldInvoiceDiscount->updated_at,
-                    'value' => $oldInvoiceDiscount->value
+                    'value' => $oldInvoiceDiscount->percentage == 1 ? $oldInvoiceDiscount->value : HelperMethods::examineMoneyValue($oldInvoiceDiscount->value)
                 ]);
             }
 
