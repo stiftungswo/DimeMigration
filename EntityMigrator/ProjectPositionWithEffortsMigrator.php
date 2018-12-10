@@ -17,7 +17,7 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
 
         foreach ($oldProjectPositions as $oldProjectPosition) {
             // we first need to migrate the rate unit to get the factor
-            $newRateUnitId = $rateUnitMigrator->doMigration($oldProjectPosition->rateUnitType_id, $oldProjectPosition->rate_unit);
+            $newRateUnitId = $rateUnitMigrator->doMigration($oldProjectPosition->rateUnitType_id, $oldProjectPosition->rate_unit, true);
             $newRateUnit = $this->capsule->connection('newDime')->table('rate_units')->find($newRateUnitId);
 
             $newProjectPositionId = $this->capsule->connection('newDime')->table('project_positions')->insertGetId([

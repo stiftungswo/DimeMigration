@@ -70,8 +70,8 @@ class InvoiceMigrator extends BaseMigrator
                     'invoice_id' => $oldInvoice->id,
                     'order' => $oldInvoicePosition->order_no,
                     'price_per_rate' => HelperMethods::examineMoneyValue($oldInvoicePosition->rate_value),
-                    'project_position_id' => null,// $oldInvoicePosition->activity_id ? $reverseProjectPositions[$oldInvoicePosition->activity_id] : null,
-                    'rate_unit_id' => $rateUnitMigrator->doMigration($oldInvoicePosition->rateUnit, $oldInvoicePosition->rateUnit),
+                    'project_position_id' => $oldInvoicePosition->activity_id ? $reverseProjectPositions[$oldInvoicePosition->activity_id] : null,
+                    'rate_unit_id' => $rateUnitMigrator->doMigration($oldInvoicePosition->rateUnit, $oldInvoicePosition->rateUnit, true),
                     'updated_at' => $oldInvoicePosition->updated_at,
                     'vat' => $oldInvoicePosition->vat
                 ]);

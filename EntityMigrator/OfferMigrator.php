@@ -42,7 +42,7 @@ class OfferMigrator extends BaseMigrator
                     'offer_id' => $newOfferId,
                     'order' => is_null($oldOfferPosition->order_no) ? 0 : $oldOfferPosition->order_no,
                     'price_per_rate' =>HelperMethods::examineMoneyValue($oldOfferPosition->rate_value),
-                    'rate_unit_id' => $rateUnitMigrator->doMigration($oldOfferPosition->rateUnitType_id, $oldOfferPosition->rate_unit),
+                    'rate_unit_id' => $rateUnitMigrator->doMigration($oldOfferPosition->rateUnitType_id, $oldOfferPosition->rate_unit, true),
                     'service_id' => $reverseServices[$oldOfferPosition->service_id],
                     'updated_at' => $oldOfferPosition->updated_at,
                     'vat' => $oldOfferPosition->vat

@@ -15,7 +15,7 @@ class RateUnitMigrator extends BaseMigrator
      * @return int
      * @throws \Exception
      */
-    public function doMigration($effort_unit, $billing_unit)
+    public function doMigration($effort_unit, $billing_unit, $archived = false)
     {
         $matchingNewRateUnits = $this->capsule->connection('newDime')->table('rate_units')->where([
             ['billing_unit', "=", $billing_unit],
@@ -30,7 +30,7 @@ class RateUnitMigrator extends BaseMigrator
             // create new rate unit
             // TODO change name after rate units got cleaned up on production
             $newRateUnitId = $this->capsule->connection('newDime')->table('rate_units')->insertGetId([
-                'archived' => false,
+                'archived' => $archived,
                 'billing_unit' => $billing_unit,
                 'created_at' => new DateTime(),
                 'effort_unit' => $effort_unit,
