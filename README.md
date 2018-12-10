@@ -10,18 +10,7 @@ Some of the entities have major changes in terms of table name, table attribute 
 
 ## Configuration
 
-There is currently no option to configure anything (but planned!), so boot up your databases with the following configuration:
-
-Old Dime:
- - Host: 127.0.0.1:3010
- - Username / Password: root / no password
- - Database name: dime
- 
- New Dime:
-  - Host: 127.0.0.1:33306
-  - Username / Password: root / no password
-  - Database name: dime
-
+You need a connection to both the old and the new Dime database. The connection to those database are configurable through a .env file in the root folder of the project. Have a look at .env.example which things need to be configured and create your own .env or rename .env.example to .env if you run both databases with the same settings.
 ## Usage
 
 Run the migration with the following command: `` php MigrateDime.php``

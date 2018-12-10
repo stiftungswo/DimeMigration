@@ -2,6 +2,7 @@
 
 namespace EntityMigrator;
 
+use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 abstract class BaseMigrator
@@ -15,27 +16,28 @@ abstract class BaseMigrator
     public function __construct()
     {
         $capsule = new Capsule;
+        $dotenv = new Dotenv(dirname( dirname(__FILE__) ));
+        $dotenv->load();
 
-        // TODO Add .env package and configure this with .env files
         $capsule->addConnection([
-            'driver' => 'mysql',
-            'host' => '127.0.0.1',
-            'port' => '3010',
-            'database' => 'dime',
-            'username' => 'root',
-            'password' => '',
+            'driver' => env('OLD_DB_CONNECTION'),
+            'host' => env('OLD_DB_HOST'),
+            'port' => env('OLD_DB_PORT'),
+            'database' => env('OLD_DB_NAME'),
+            'username' => env('OLD_DB_USERNAME'),
+            'password' => env('OLD_DB_PASSWORD'),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
         ], 'oldDime');
 
         $capsule->addConnection([
-            'driver' => 'mysql',
-            'host' => '127.0.0.1',
-            'port' => '33306',
-            'database' => 'dime',
-            'username' => 'root',
-            'password' => '',
+            'driver' => env('NEW_DB_CONNECTION'),
+            'host' => env('NEW_DB_HOST'),
+            'port' => env('NEW_DB_PORT'),
+            'database' => env('NEW_DB_NAME'),
+            'username' => env('NEW_DB_USERNAME'),
+            'password' => env('NEW_DB_PASSWORD'),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
