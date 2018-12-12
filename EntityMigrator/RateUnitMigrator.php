@@ -28,7 +28,6 @@ class RateUnitMigrator extends BaseMigrator
                 ->where('id', '=', $effort_unit)->first();
 
             // create new rate unit
-            // TODO change name after rate units got cleaned up on production
             $newRateUnitId = $this->capsule->connection('newDime')->table('rate_units')->insertGetId([
                 'archived' => $archived,
                 'billing_unit' => $billing_unit,
@@ -36,7 +35,7 @@ class RateUnitMigrator extends BaseMigrator
                 'effort_unit' => $effort_unit,
                 'factor' => $oldRateUnit ? $oldRateUnit->factor == 1 ? 1 : $oldRateUnit->factor / 60 : 1,
                 'is_time' => $oldRateUnit ? $oldRateUnit->factor != 1 : false,
-                'name' => $billing_unit,
+                'name' => $oldRateUnit ? $oldRateUnit->name : $billing_unit,
                 'updated_at' => new DateTime(),
             ]);
         } else {
