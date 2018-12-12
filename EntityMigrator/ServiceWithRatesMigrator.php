@@ -43,7 +43,7 @@ class ServiceWithRatesMigrator extends BaseMigrator
                 $this->capsule->connection('newDime')->table('service_rates')->insert([
                     'created_at' => $rateOfService->created_at,
                     'rate_group_id' => $reverseRateGroups[$rateOfService->rate_group_id],
-                    'rate_unit_id' => $rateUnitMigrator->doMigration($rateOfService->rateUnitType_id, $rateOfService->rate_unit),
+                    'rate_unit_id' => $rateUnitMigrator->doMigration($rateOfService->rateUnitType_id, $rateOfService->rate_unit, $oldService->archived == 1),
                     'service_id' => $newServiceId,
                     'updated_at' => $rateOfService->updated_at,
                     'value' => HelperMethods::examineMoneyValue($rateOfService->rate_value)
