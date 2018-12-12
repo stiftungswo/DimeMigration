@@ -52,7 +52,7 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
                     'date' => $oldTimeslice->started_at,
                     'employee_id' => is_null($oldTimeslice->employee_id) ? : $reverseEmployees[$oldTimeslice->employee_id],
                     'position_id' => $newProjectPositionId,
-                    'value' => $newRateUnit->factor == 1 ? $oldTimeslice->value : $oldTimeslice->value / 60,
+                    'value' => $newRateUnit->is_time == 0 ? $oldTimeslice->value : $oldTimeslice->value / 60,
                     'updated_at' => $oldTimeslice->updated_at,
                     'updated_by' => $oldTimeslice->user_id ? $reverseEmployees[$oldTimeslice->user_id] : null,
                 ]);
