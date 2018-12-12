@@ -45,7 +45,7 @@ class InvoiceMigrator extends BaseMigrator
                 'address_id' => $newAddressId,
                 'created_at' => $oldInvoice->created_at,
                 'created_by' => $oldInvoice->user_id ? $reverseEmployees[$oldInvoice->user_id] : null,
-                'customer_id' => $oldInvoice->customer_id ? $reverseCustomers[$oldInvoice->customer_id]['person'] : null,
+                'customer_id' => $oldInvoice->customer_id ? $reverseCustomers[$oldInvoice->customer_id]['person'] ?: $reverseCustomers[$oldInvoice->customer_id]['company'] : null,
                 'description' => $oldInvoice->description,
                 'end' => $oldInvoice->end,
                 'fixed_price' => HelperMethods::examineMoneyValue($oldInvoice->fixed_price, true),

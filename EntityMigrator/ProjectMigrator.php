@@ -46,7 +46,7 @@ class ProjectMigrator extends BaseMigrator
                 'chargeable' => $oldProject->chargeable == 1,
                 'created_at' => $oldProject->created_at,
                 'created_by' => $oldProject->user_id ? $reverseEmployees[$oldProject->user_id] : null,
-                'customer_id' => $reverseCustomers[$oldProject->customer_id]['person'],
+                'customer_id' => $reverseCustomers[$oldProject->customer_id]['person'] ?: $reverseCustomers[$oldProject->customer_id]['company'],
                 'deadline' => $oldProject->deadline,
                 'description' => $oldProject->description,
                 'id' => $oldProject->id,

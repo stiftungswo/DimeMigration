@@ -44,45 +44,49 @@ class CustomerMigrator extends BaseMigrator
                 $reverseCustomers[$oldCustomer->id]['company'] = $newCompanyId;
             }
 
-            // create new person
-            $partForName = explode(' ', !empty($oldCustomer->full_name) ?: $oldCustomer->name);
-            $lastName = array_pop($partForName);
-            $firstName = array(implode(' ', $partForName), $lastName)[0];
+            // dont create a person if fullname field of oldCustomer is empty
+            // then it is probably just a company
+            if (!empty($oldCustomer->fullname)) {
+                // create new person
+                $partForName = explode(' ', $oldCustomer->fullname ?: $oldCustomer->name);
+                $lastName = array_pop($partForName);
+                $firstName = array(implode(' ', $partForName), $lastName)[0];
 
-            HelperMethods::printWithNewLine("Creating a new person " . $firstName . ' ' . $lastName);
-            $newPersonId = $this->capsule->connection('newDime')->table('customers')->insertGetId([
-                'company_id' => $oldCustomer->company ? $newCompanyId : null,
-                'comment' => $oldCustomer->comment,
-                'created_at' => $oldCustomer->created_at,
-                'created_by' => is_null($oldCustomer->user_id) ? null : $reverseEmployees[$oldCustomer->user_id],
-                'department' => $oldCustomer->department,
-                'email' => $oldCustomer->email,
-                'hidden' => $oldCustomer->system_customer != 1,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'rate_group_id' => $oldCustomer->rate_group_id,
-                'type' => 'person',
-                'salutation' => $oldCustomer->salutation,
-                'updated_at' => $oldCustomer->updated_at
-            ]);
-            $reverseCustomers[$oldCustomer->id]['person'] = $newPersonId;
+                HelperMethods::printWithNewLine("Creating a new person " . $firstName . ' ' . $lastName);
+                $newPersonId = $this->capsule->connection('newDime')->table('customers')->insertGetId([
+                    'company_id' => $oldCustomer->company ? $newCompanyId : null,
+                    'comment' => $oldCustomer->comment,
+                    'created_at' => $oldCustomer->created_at,
+                    'created_by' => is_null($oldCustomer->user_id) ? null : $reverseEmployees[$oldCustomer->user_id],
+                    'department' => $oldCustomer->department,
+                    'email' => $oldCustomer->email,
+                    'hidden' => $oldCustomer->system_customer != 1,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'rate_group_id' => $oldCustomer->rate_group_id,
+                    'type' => 'person',
+                    'salutation' => $oldCustomer->salutation,
+                    'updated_at' => $oldCustomer->updated_at
+                ]);
+                $reverseCustomers[$oldCustomer->id]['person'] = $newPersonId;
+            }
 
             // create new phone if set on old customer
             if (!empty($oldCustomer->phone)) {
-                HelperMethods::printWithNewLine("Creating new phone for " . $firstName . ' ' . $lastName);
+                HelperMethods::printWithNewLine("Creating new phone for " . $oldCustomer->name);
                 $this->capsule->connection('newDime')->table('phones')->insert([
                     'category' => $oldCustomer->company ? 2 : 3,
-                    'customer_id' => $newPersonId,
+                    'customer_id' => $newPersonId ?: $newCompanyId,
                     'number' => $oldCustomer->phone,
                 ]);
             }
 
             // create new mobile number if set on old customer
             if (!empty($oldCustomer->mobilephone)) {
-                HelperMethods::printWithNewLine("Creating new mobile phone for " . $firstName . ' ' . $lastName);
+                HelperMethods::printWithNewLine("Creating new mobile phone for " . $oldCustomer->name);
                 $this->capsule->connection('newDime')->table('phones')->insert([
                     'category' => 4,
-                    'customer_id' => $newPersonId,
+                    'customer_id' => $newPersonId ?: $newCompanyId,
                     'number' => $oldCustomer->mobilephone,
                 ]);
             }

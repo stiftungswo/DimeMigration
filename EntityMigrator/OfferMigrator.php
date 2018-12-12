@@ -22,7 +22,7 @@ class OfferMigrator extends BaseMigrator
                 'address_id' => empty($newAddress) ? null : $newAddress->id,
                 'created_at' => $oldOffer->created_at,
                 'created_by' => is_null($oldOffer->user_id) ? null : $reverseEmployees[$oldOffer->user_id],
-                'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'],
+                'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'] ?: $reverseCustomers[$oldOffer->customer_id]['company'],
                 'description' => $oldOffer->description,
                 'id' => $oldOffer->id,
                 'fixed_price' => HelperMethods::examineMoneyValue($oldOffer->fixed_price, true),
