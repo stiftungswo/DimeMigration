@@ -44,7 +44,6 @@ class InvoiceMigrator extends BaseMigrator
                 'accountant_id' => $oldInvoice->accountant_id ? $reverseEmployees[$oldInvoice->accountant_id] : null,
                 'address_id' => $newAddressId,
                 'created_at' => $oldInvoice->created_at,
-                'created_by' => $oldInvoice->user_id ? $reverseEmployees[$oldInvoice->user_id] : null,
                 'customer_id' => $oldInvoice->customer_id ? $reverseCustomers[$oldInvoice->customer_id]['person'] ?: $reverseCustomers[$oldInvoice->customer_id]['company'] : null,
                 'description' => $oldInvoice->description,
                 'end' => $oldInvoice->end,
@@ -53,7 +52,8 @@ class InvoiceMigrator extends BaseMigrator
                 'project_id' => $oldInvoice->project_id,
                 'name' => $oldInvoice->name,
                 'start' => $oldInvoice->start,
-                'updated_at' => $oldInvoice->updated_at
+                'updated_at' => $oldInvoice->updated_at,
+                'updated_by' => $oldInvoice->user_id ? $reverseEmployees[$oldInvoice->user_id] : null,
             ]);
 
             // migrate the positions / items
@@ -90,6 +90,7 @@ class InvoiceMigrator extends BaseMigrator
                     'name' => $oldInvoiceDiscount->name,
                     'percentage' => $oldInvoiceDiscount->percentage == 1,
                     'updated_at' => $oldInvoiceDiscount->updated_at,
+                    'updated_by' => $oldInvoiceDiscount->user_id ? $reverseEmployees[$oldInvoiceDiscount->user_id] : null,
                     'value' => $oldInvoiceDiscount->percentage == 1 ? $oldInvoiceDiscount->value : HelperMethods::examineMoneyValue($oldInvoiceDiscount->value)
                 ]);
             }

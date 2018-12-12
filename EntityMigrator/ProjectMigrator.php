@@ -45,7 +45,6 @@ class ProjectMigrator extends BaseMigrator
                 'category_id' => $oldProject->project_category_id ? $reverseProjectCategories[$oldProject->project_category_id] : null,
                 'chargeable' => $oldProject->chargeable == 1,
                 'created_at' => $oldProject->created_at,
-                'created_by' => $oldProject->user_id ? $reverseEmployees[$oldProject->user_id] : null,
                 'customer_id' => $reverseCustomers[$oldProject->customer_id]['person'] ?: $reverseCustomers[$oldProject->customer_id]['company'],
                 'deadline' => $oldProject->deadline,
                 'description' => $oldProject->description,
@@ -55,6 +54,7 @@ class ProjectMigrator extends BaseMigrator
                 'offer_id' => $eventualOffer ? $eventualOffer->id : null,
                 'rate_group_id' => $reverseRateGroups[$oldProject->rate_group_id],
                 'updated_at' => $oldProject->updated_at,
+                'updated_by' => $oldProject->user_id ? $reverseEmployees[$oldProject->user_id] : null,
                 'vacation_project' => $oldProject->name == 'SWO: Ferien'
             ]);
         }

@@ -57,7 +57,6 @@ class CustomerMigrator extends BaseMigrator
                     'company_id' => $oldCustomer->company ? $newCompanyId : null,
                     'comment' => $oldCustomer->comment,
                     'created_at' => $oldCustomer->created_at,
-                    'created_by' => is_null($oldCustomer->user_id) ? null : $reverseEmployees[$oldCustomer->user_id],
                     'department' => $oldCustomer->department,
                     'email' => $oldCustomer->email,
                     'hidden' => $oldCustomer->system_customer != 1,
@@ -66,7 +65,8 @@ class CustomerMigrator extends BaseMigrator
                     'rate_group_id' => $oldCustomer->rate_group_id,
                     'type' => 'person',
                     'salutation' => $oldCustomer->salutation,
-                    'updated_at' => $oldCustomer->updated_at
+                    'updated_at' => $oldCustomer->updated_at,
+                    'updated_by' => is_null($oldCustomer->user_id) ? null : $reverseEmployees[$oldCustomer->user_id],
                 ]);
                 $reverseCustomers[$oldCustomer->id]['person'] = $newPersonId;
             }

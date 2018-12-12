@@ -26,12 +26,12 @@ class ServiceWithRatesMigrator extends BaseMigrator
             $newServiceId = $this->capsule->connection('newDime')->table('services')->insertGetId([
                 'archived' => $oldService->archived == 1,
                 'created_at' => $oldService->created_at,
-                'created_by' => $reverseEmployees[$oldService->user_id],
                 'deleted_at' => $oldService->deleted_at,
                 'description' => $oldService->description,
                 'name' => $oldService->name,
                 'vat' => $oldService->vat,
                 'updated_at' => $oldService->updated_at,
+                'updated_by' => $reverseEmployees[$oldService->user_id],
             ]);
 
             $reverseServices[$oldService->id] = $newServiceId;
@@ -46,6 +46,7 @@ class ServiceWithRatesMigrator extends BaseMigrator
                     'rate_unit_id' => $rateUnitMigrator->doMigration($rateOfService->rateUnitType_id, $rateOfService->rate_unit, $oldService->archived == 1),
                     'service_id' => $newServiceId,
                     'updated_at' => $rateOfService->updated_at,
+                    'updated_by' => $reverseEmployees[$rateOfService->user_id],
                     'value' => HelperMethods::examineMoneyValue($rateOfService->rate_value)
                 ]);
             }

@@ -22,7 +22,6 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
 
             $newProjectPositionId = $this->capsule->connection('newDime')->table('project_positions')->insertGetId([
                 'created_at' => $oldProjectPosition->created_at,
-                // 'created_by' => $oldProjectPosition->user_id ? $reverseEmployees[$oldProjectPosition->user_id] : null,
                 'deleted_at' => $oldProjectPosition->deleted_at,
                 'description' => $oldProjectPosition->description,
                 'price_per_rate' => HelperMethods::examineMoneyValue($oldProjectPosition->rate_value),
@@ -30,6 +29,7 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
                 'rate_unit_id' => $newRateUnitId,
                 'service_id' => $reverseServices[$oldProjectPosition->service_id],
                 'updated_at' => $oldProjectPosition->updated_at,
+                'updated_by' => $oldProjectPosition->user_id ? $reverseEmployees[$oldProjectPosition->user_id] : null,
                 'vat' => $oldProjectPosition->vat ?: 0
             ]);
 
@@ -48,13 +48,13 @@ class ProjectPositionWithEffortsMigrator extends BaseMigrator
             foreach ($oldTimeslicesOfPosition as $oldTimeslice) {
                 $this->capsule->connection('newDime')->table('project_efforts')->insert([
                     'created_at' => $oldTimeslice->created_at,
-                    'created_by' => $oldTimeslice->user_id ? $reverseEmployees[$oldTimeslice->user_id] : null,
                     'deleted_at' => $oldTimeslice->deleted_at,
                     'date' => $oldTimeslice->started_at,
                     'employee_id' => is_null($oldTimeslice->employee_id) ? : $reverseEmployees[$oldTimeslice->employee_id],
                     'position_id' => $newProjectPositionId,
                     'value' => $newRateUnit->factor == 1 ? $oldTimeslice->value : $oldTimeslice->value / 60,
                     'updated_at' => $oldTimeslice->updated_at,
+                    'updated_by' => $oldTimeslice->user_id ? $reverseEmployees[$oldTimeslice->user_id] : null,
                 ]);
             }
         }

@@ -19,10 +19,10 @@ class ProjectCommentMigrator extends BaseMigrator
             $this->capsule->connection('newDime')->table('project_comments')->insert([
                 'comment' => $oldProjectComment->comment,
                 'created_at' => $oldProjectComment->created_at,
-                'created_by' => $oldProjectComment->user_id ? $reverseEmployees[$oldProjectComment->user_id] : null,
                 'date' => $oldProjectComment->date,
                 'project_id' => $oldProjectComment->project_id,
                 'updated_at' => $oldProjectComment->updated_at,
+                'updated_by' => $oldProjectComment->user_id ? $reverseEmployees[$oldProjectComment->user_id] : null,
             ]);
         }
     }

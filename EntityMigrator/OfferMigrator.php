@@ -21,7 +21,6 @@ class OfferMigrator extends BaseMigrator
                 'accountant_id' => $reverseEmployees[$oldOffer->accountant_id],
                 'address_id' => empty($newAddress) ? null : $newAddress->id,
                 'created_at' => $oldOffer->created_at,
-                'created_by' => is_null($oldOffer->user_id) ? null : $reverseEmployees[$oldOffer->user_id],
                 'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'] ?: $reverseCustomers[$oldOffer->customer_id]['company'],
                 'description' => $oldOffer->description,
                 'id' => $oldOffer->id,
@@ -30,7 +29,8 @@ class OfferMigrator extends BaseMigrator
                 'rate_group_id' => $reverseRateGroups[$oldOffer->rate_group_id],
                 'short_description' => $oldOffer->short_description,
                 'status' => $oldOffer->status_id,
-                'updated_at' => $oldOffer->updated_at
+                'updated_at' => $oldOffer->updated_at,
+                'updated_by' => $oldOffer->user_id ? $reverseEmployees[$oldOffer->user_id] : null,
             ]);
 
             $oldPositionsOfOffer = $this->capsule->connection('oldDime')->table('offer_positions')->where('offer_id', '=', $oldOffer->id)->get();
@@ -45,6 +45,7 @@ class OfferMigrator extends BaseMigrator
                     'rate_unit_id' => $rateUnitMigrator->doMigration($oldOfferPosition->rateUnitType_id, $oldOfferPosition->rate_unit, true),
                     'service_id' => $reverseServices[$oldOfferPosition->service_id],
                     'updated_at' => $oldOfferPosition->updated_at,
+                    'updated_by' => $oldOfferPosition->user_id ? $reverseEmployees[$oldOfferPosition->user_id] : null,
                     'vat' => $oldOfferPosition->vat
                 ]);
             }
@@ -58,6 +59,7 @@ class OfferMigrator extends BaseMigrator
                     'offer_id' => $newOfferId,
                     'percentage' => $oldOfferDiscount->percentage == 1,
                     'updated_at' => $oldOfferDiscount->updated_at,
+                    'updated_by' => $oldOfferDiscount->user_id ? $reverseEmployees[$oldOfferDiscount->user_id] : null,
                     'value' => $oldOfferDiscount->value
                 ]);
             }
