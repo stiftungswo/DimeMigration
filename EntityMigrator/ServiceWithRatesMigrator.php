@@ -31,7 +31,7 @@ class ServiceWithRatesMigrator extends BaseMigrator
                 'name' => $oldService->name,
                 'vat' => $oldService->vat,
                 'updated_at' => $oldService->updated_at,
-                'updated_by' => $reverseEmployees[$oldService->user_id],
+                'updated_by' => $oldService->user_id ? $reverseEmployees[$oldService->user_id] : null,
             ]);
 
             $reverseServices[$oldService->id] = $newServiceId;
@@ -46,7 +46,7 @@ class ServiceWithRatesMigrator extends BaseMigrator
                     'rate_unit_id' => $rateUnitMigrator->doMigration($rateOfService->rateUnitType_id, $rateOfService->rate_unit, $oldService->archived == 1 || $oldService->deleted_at),
                     'service_id' => $newServiceId,
                     'updated_at' => $rateOfService->updated_at,
-                    'updated_by' => $reverseEmployees[$rateOfService->user_id],
+                    'updated_by' => $rateOfService->user_id ? $reverseEmployees[$rateOfService->user_id] : null,
                     'value' => HelperMethods::examineMoneyValue($rateOfService->rate_value)
                 ]);
             }

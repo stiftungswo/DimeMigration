@@ -18,7 +18,7 @@ class OfferMigrator extends BaseMigrator
             $newAddress = $addressMigrator->doMigration($oldAddressOfOffer, empty($reverseCustomers[$oldOffer->customer_id]['company']) ? $reverseCustomers[$oldOffer->customer_id]['person'] : $reverseCustomers[$oldOffer->customer_id]['company']);
 
             $newOfferId = $this->capsule->connection('newDime')->table('offers')->insertGetId([
-                'accountant_id' => $reverseEmployees[$oldOffer->accountant_id],
+                'accountant_id' => $oldOffer->accountant_id ? $reverseEmployees[$oldOffer->accountant_id] : null,
                 'address_id' => empty($newAddress) ? null : $newAddress->id,
                 'created_at' => $oldOffer->created_at,
                 'customer_id' => $reverseCustomers[$oldOffer->customer_id]['person'] ?: $reverseCustomers[$oldOffer->customer_id]['company'],
