@@ -102,7 +102,7 @@ class InvoiceMigrator extends BaseMigrator
 
             HelperMethods::printWithNewLine("Migrating costgroup distributions for " . $oldInvoice->id);
             foreach ($oldCostgroupDistributionsOfInvoice as $oldCostgroupDistribution) {
-                $this->capsule->connection('newDime')->table('costgroup_distributions')->insert([
+                $this->capsule->connection('newDime')->table('invoice_costgroup_distributions')->insert([
                     'created_at' => $oldCostgroupDistribution->created_at,
                     'costgroup_number' => $reverseCostgroups[$oldCostgroupDistribution->costgroup_id],
                     'invoice_id' => $oldInvoice->id,
