@@ -45,7 +45,7 @@ class ProjectMigrator extends BaseMigrator
                 'category_id' => $oldProject->project_category_id ? $reverseProjectCategories[$oldProject->project_category_id] : null,
                 'chargeable' => $oldProject->chargeable == 1,
                 'created_at' => $oldProject->created_at,
-                'customer_id' => $reverseCustomers[$oldProject->customer_id]['person'] ?: $reverseCustomers[$oldProject->customer_id]['company'],
+                'customer_id' => array_key_exists('person', $reverseCustomers[$oldProject->customer_id]) ? $reverseCustomers[$oldProject->customer_id]['person'] : $reverseCustomers[$oldProject->customer_id]['company'],
                 'deadline' => $oldProject->deadline,
                 'description' => $oldProject->description,
                 'id' => $oldProject->id,
