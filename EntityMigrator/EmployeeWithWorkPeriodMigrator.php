@@ -23,17 +23,19 @@ class EmployeeWithWorkPeriodMigrator extends BaseMigrator
 
             HelperMethods::printWithNewLine("Migrating employee with mail " . $oldEmployee->email ?: '');
 
-            // TODO Dynamically generate a fine password and save it to a file on the disk
+            $password = $this->randomPassword();
+            file_put_contents('logins.txt', $oldEmployee->email . ' ' . $password . "\n", FILE_APPEND | LOCK_EX);
+
             $newEmployeeId = $this->capsule->connection('newDime')->table('employees')->insertGetId([
                 'archived' => $oldEmployee->enabled != 1,
                 'can_login' => $oldEmployee->enabled == 1,
                 'created_at' => $oldEmployee->created_at,
-                'email' => $oldEmployee->email ?: '', // TODO discuss with Dani / Philipp if this makes any sense
+                'email' => $oldEmployee->email ?: '',
                 'first_name' => $oldEmployee->firstname ?: '',
                 'holidays_per_year' => $oldEmployee->employeeholiday,
                 'is_admin' => strpos($oldEmployee->roles, 'ROLE_SUPER_ADMIN') !== false,
                 'last_name' => $oldEmployee->lastname ?: '',
-                'password' => $hasher->make('Welcome01'),
+                'password' => $hasher->make($password),
                 'updated_at' => $oldEmployee->updated_at,
             ]);
 
@@ -60,5 +62,17 @@ class EmployeeWithWorkPeriodMigrator extends BaseMigrator
         }
 
         return $reverseEmployees;
+    }
+
+    // SOURCE: https://stackoverflow.com/a/6101969
+    private function randomPassword() {
+        $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        for ($i = 0; $i < 8; $i++) {
+            $n = rand(0, $alphaLength);
+            $pass[] = $alphabet[$n];
+        }
+        return implode($pass); //turn the array into a string
     }
 }
